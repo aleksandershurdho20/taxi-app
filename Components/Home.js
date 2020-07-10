@@ -7,6 +7,8 @@ const Home = () => {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [seconds, setSeconds] = useState(0);
+  const [dataIsLoading, setDataIsLoading] = useState(false);
+
   const [object, setObject] = useState({
     deviceId: "string",
     location: {
@@ -22,15 +24,19 @@ const Home = () => {
         'Oops, this will not work on Sketch in an Android emulator. Try it on your device!'
       );
     } else {
-      (async () => {
-        let { status } = await Location.requestPermissionsAsync();
-        if (status !== 'granted') {
-          setErrorMsg('Permission to access location was denied');
-        }
-
-        let location = await Location.getCurrentPositionAsync({});
-        setLocation(location);
-      })();
+        setDataIsLoading(true);
+        (async () => {
+          let { status } = await Location.requestPermissionsAsync();
+          console.log(status);
+          if (status !== 'granted') {
+            setErrorMsg('Permission to access location was denied');
+          }
+  
+          let location = await Location.getCurrentPositionAsync({});
+          console.log(location);
+          setLocation(location);
+        })();
+          setDataIsLoading(false);
     }
 
     const interval = setInterval(() => {
