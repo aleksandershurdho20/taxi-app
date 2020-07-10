@@ -52,7 +52,7 @@ const Home = ({ updateUsers }) => {
       //  }
       //);
       updateUsers(deviceId, { location: { ...coordinates } });
-    }, 1000);
+    }, 6000);
 
     return () => clearInterval(interval);
   }, []);
