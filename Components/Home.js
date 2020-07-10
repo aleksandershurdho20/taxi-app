@@ -1,56 +1,58 @@
-import React from 'react';
-import { StyleSheet, Text, View ,TouchableOpacity } from 'react-native';
-export default function Home (){
-    return(
-        <View>
-            <Text style={styles.Title}>Merr Taxi</Text>
-            <TouchableOpacity  style={styles.ButtonDanger}>
-                <Text style={styles.buttonText}>I zene</Text>
+import React, { useState, useEffect } from "react";
+import { Platform, Text, View, StyleSheet } from 'react-native';
+import Constants from 'expo-constants';
+import * as Location from 'expo-location';
 
+const Home = () => {
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+  const [seconds, setSeconds] = useState(0);
+  const [object, setObject] = useState({
+    deviceId: "string",
+    location: {
+      lat: "",
+      lng: ""
+    }
+  });
 
-            </TouchableOpacity >
-            <TouchableOpacity style={styles.ButtonSuccess}>
-                <Text style={styles.buttonText}>I Lire</Text>
+  useEffect(() => {
+   
+    if (Platform.OS === 'android' && !Constants.isDevice) {
+      setErrorMsg(
+        'Oops, this will not work on Sketch in an Android emulator. Try it on your device!'
+      );
+    } else {
+      (async () => {
+        let { status } = await Location.requestPermissionsAsync();
+        if (status !== 'granted') {
+          setErrorMsg('Permission to access location was denied');
+        }
 
-            </TouchableOpacity>
-        </View>
-    )
-}
+        let location = await Location.getCurrentPositionAsync({});
+        setLocation(location);
+      })();
+    }
 
-const styles=StyleSheet.create({
-        ButtonDanger:{
-       borderRadius:8,
-       paddingVertical:14,
-       paddingHorizontal:10,
-       backgroundColor:'red'
-    },
-    buttonText:{
-        color:'#fff',
-        fontWeight:'bold',
-        textTransform:'uppercase',
-        fontSize:16,
-        textAlign:'center'
-    },
-    Title:{
-        textAlign:'center',
-        marginBottom:10,
-        fontSize:15
+    const interval = setInterval(() => {
+      setSeconds(seconds => seconds + 1);
+      setObject({
+        deviceId: "string",
+        location: {
+          lat: location.latitude ,
+          lng: location.longitude
+        }
+      });
+    }, 6000);
+    return () => clearInterval(interval)
+    ;
+  }, []);
 
-    },
-    ButtonStatusFree:{
-        borderRadius:8,
-        paddingVertical:14,
-        paddingHorizontal:10,
-        backgroundColor:'red',
-        marginBottom:10
-     },
-
-     ButtonSuccess:{
-        borderRadius:8,
-        paddingVertical:14,
-        paddingHorizontal:10,
-        backgroundColor:'green',
-        marginTop:10
-     },
-     
-})
+  return (
+    <View className="App">
+      <Text>
+       {object.location.lat} {seconds}
+       </Text>
+    </View>
+  );
+};
+export default Home
