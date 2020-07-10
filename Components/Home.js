@@ -1,25 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
 import * as Location from "expo-location";
+import * as Device from "expo-device";
 
-const Home = () => {
+const Home = ({ updateUsers }) => {
   const [errorMsg, setErrorMsg] = useState(null);
-  const [deviceId] = useState("0");
+  const [deviceId, setDeviceId] = useState("0");
   const [coordinates, setCoordinates] = useState({
     lat: 0,
     long: 0,
   });
 
-  const postData = async (url = "", data = {}) => {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-    return response.json();
-  };
+  //const postData = async (url = "", data = {}) => {
+  //  const response = await fetch(url, {
+  //    method: "POST",
+  //    headers: {
+  //      "Content-Type": "application/json",
+  //    },
+  //    body: JSON.stringify(data),
+  //  });
+  //  return response.json();
+  //};
 
   const updateCurrentPosition = async () => {
     let location = await Location.getCurrentPositionAsync();
@@ -40,15 +41,18 @@ const Home = () => {
   });
 
   useEffect(() => {
+    // init device id
+    setDeviceId(`${Device.brand} ${Device.deviceName}`);
     const interval = setInterval(async () => {
-      postData(
-        "https://europe-west3-merr-taxi.cloudfunctions.net/registerLocation",
-        {
-          deviceId,
-          location: { ...coordinates },
-        }
-      );
-    }, 60000);
+      //postData(
+      //  "https://europe-west3-merr-taxi.cloudfunctions.net/registerLocation",
+      //  {
+      //    deviceId,
+      //    location: { ...coordinates },
+      //  }
+      //);
+      updateUsers(deviceId, { location: { ...coordinates } });
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);
@@ -64,7 +68,9 @@ const Home = () => {
       >
         <Text style={styles.buttonTitle}>I Zene</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={[styles.button, { backgroundColor: "#10ac84" }]}>
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: "#10ac84" }]}
+      >
         <Text style={styles.buttonTitle}>I Lire</Text>
       </TouchableOpacity>
     </View>
@@ -72,6 +78,7 @@ const Home = () => {
 };
 
 const styles = StyleSheet.create({
+    //Button Styles 
   button: {
     width: 150,
     height: 75,
